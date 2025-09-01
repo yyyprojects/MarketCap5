@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The U.S. Stock Market: A Visual Guide to its Size & Composition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Brilliant Blues -->
+    <!-- Narrative & Structure Plan: The infographic tells a story of scale and concentration. It starts with the immense total value of the U.S. market (the "hook"), then puts that number in global context. It then dissects the market's internal composition by sector, before drilling down into the S&P 500 to show the outsized influence of a few mega-cap companies. The narrative concludes by highlighting the top individual companies, cementing the theme of a market that is both vast and top-heavy. This logical flow from macro to micro is designed for easy comprehension. -->
+    <!-- Visualization Choices: 1. Total Market Cap -> Goal: Inform -> Viz: Single Big Number -> Justification: Maximum impact for the headline statistic. Method: Styled HTML. 2. Global Share -> Goal: Compare -> Viz: Donut Chart -> Justification: Best for showing a dominant part-to-whole relationship (U.S. vs. World). Library: Chart.js. 3. Sector Breakdown -> Goal: Compare -> Viz: Bar Chart -> Justification: Clearly compares the weight of multiple categories (sectors). Library: Chart.js. 4. S&P 500 Concentration -> Goal: Compare/Composition -> Viz: Horizontal Stacked Bar -> Justification: Powerfully shows the immense weight of the top 10 companies within the 100% index value. Library: Chart.js. 5. Top 5 Companies -> Goal: Rank/Organize -> Viz: Ordered Bar Chart -> Justification: Simple and effective for ranking the largest individual players. Library: Chart.js. All choices avoid SVG/Mermaid as required. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .stat-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .accent-bg {
+             background-color: #00449E;
+        }
+        .accent-text {
+            color: #005BC5;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold accent-text mb-2">The U.S. Stock Market</h1>
+            <p class="text-lg md:text-xl text-gray-600">A Visual Guide to its Immense Size and Composition</p>
+        </header>
+
+        <section class="text-center stat-card accent-bg text-white">
+            <h2 class="text-2xl font-semibold opacity-80">Total U.S. Stock Market Value</h2>
+            <p class="text-6xl md:text-7xl font-bold my-4">$51.5 Trillion</p>
+            <p class="opacity-80">As of early 2025, the combined value of all publicly traded companies in the United States stands as a testament to its massive economic scale.</p>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            
+            <article class="stat-card">
+                <h3 class="text-2xl font-bold text-center mb-4">Dominance on the World Stage</h3>
+                <p class="text-gray-600 mb-6 text-center text-sm">The U.S. market isn't just large; it's the single largest in the world by a significant margin, representing a substantial portion of the entire global stock market value.</p>
+                <div class="chart-container h-64 md:h-auto">
+                    <canvas id="globalShareChart"></canvas>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <h3 class="text-2xl font-bold text-center mb-4">What Drives the Market?</h3>
+                <p class="text-gray-600 mb-6 text-center text-sm">The U.S. market is diverse, but certain sectors hold more weight than others. Technology and Financials are the heavyweights that shape market trends.</p>
+                <div class="chart-container">
+                    <canvas id="sectorBreakdownChart"></canvas>
+                </div>
+            </article>
+
+            <article class="stat-card md:col-span-2">
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">The Concentration of Power</h3>
+                        <p class="text-gray-600 mb-2 text-sm">The S&P 500 index is often used as a benchmark for the entire market. Within it, a tiny fraction of companies hold a disproportionately large amount of the index's total value.</p>
+                        <p class="text-gray-600 text-sm">This chart shows that the top 10 largest companies alone make up over a third of the S&P 500's entire market capitalization, highlighting the immense influence of mega-cap stocks.</p>
+                    </div>
+                    <div class="chart-container h-48 md:h-64">
+                         <canvas id="sp500ConcentrationChart"></canvas>
+                    </div>
+                </div>
+            </article>
+
+             <article class="stat-card md:col-span-2">
+                <h3 class="text-2xl font-bold text-center mb-4">The Titans of Industry</h3>
+                <p class="text-gray-600 mb-6 text-center text-sm">The top of the U.S. market is dominated by a handful of household names in the technology and communication sectors, each valued at over a trillion dollars.</p>
+                <div class="chart-container">
+                    <canvas id="topCompaniesChart"></canvas>
+                </div>
+            </article>
+
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartColors = ['#005BC5', '#3C91FF', '#7FB8FF', '#00449E', '#A1D6E2'];
+            
+            const tooltipTitleCallback = (tooltipItems) => {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join(' ');
+                } else {
+                    return label;
+                }
+            };
+
+            const processLabels = (labels) => {
+                return labels.map(label => {
+                    if (label.length > 16) {
+                        const words = label.split(' ');
+                        const newLabel = [];
+                        let line = '';
+                        words.forEach(word => {
+                            if ((line + word).length > 16) {
+                                newLabel.push(line.trim());
+                                line = '';
+                            }
+                            line += word + ' ';
+                        });
+                        newLabel.push(line.trim());
+                        return newLabel;
+                    }
+                    return label;
+                });
+            };
+
+            new Chart(document.getElementById('globalShareChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['U.S. Market', 'Rest of World'],
+                    datasets: [{
+                        data: [44, 56],
+                        backgroundColor: ['#005BC5', '#7FB8FF'],
+                        hoverOffset: 4,
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { callbacks: { title: tooltipTitleCallback } },
+                        title: { display: true, text: 'U.S. Share of Global Stock Market (%)' }
+                    }
+                }
+            });
+
+            const sectorLabels = ['Information Technology', 'Financials', 'Health Care', 'Consumer Discretionary', 'Communication Services', 'Industrials'];
+            new Chart(document.getElementById('sectorBreakdownChart'), {
+                type: 'bar',
+                data: {
+                    labels: processLabels(sectorLabels),
+                    datasets: [{
+                        label: 'Sector Weight (%)',
+                        data: [30.1, 13.1, 12.8, 10.3, 8.6, 8.4],
+                        backgroundColor: chartColors,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                         x: { ticks: { callback: value => value + "%" } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { title: tooltipTitleCallback } },
+                        title: { display: true, text: 'U.S. Market Weight by Sector' }
+                    }
+                }
+            });
+            
+            new Chart(document.getElementById('sp500ConcentrationChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['S&P 500 Index'],
+                    datasets: [
+                        {
+                            label: 'Top 10 Companies',
+                            data: [34.5],
+                            backgroundColor: '#005BC5',
+                        },
+                        {
+                            label: 'Other 490 Companies',
+                            data: [65.5],
+                            backgroundColor: '#7FB8FF',
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, ticks: { callback: value => value + "%" }, grid: { display: false }, beginAtZero: true },
+                        y: { stacked: true, grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { callbacks: { title: tooltipTitleCallback } },
+                        title: { display: true, text: 'S&P 500 Market Cap Concentration (%)' }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('topCompaniesChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Microsoft', 'Apple', 'NVIDIA', 'Alphabet', 'Amazon'],
+                    datasets: [{
+                        label: 'Market Cap ($ Trillions)',
+                        data: [3.4, 3.2, 2.7, 2.2, 2.0],
+                        backgroundColor: chartColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { title: tooltipTitleCallback } },
+                        title: { display: true, text: 'Top 5 U.S. Companies by Market Cap' }
+                    }
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
